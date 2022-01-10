@@ -5,6 +5,7 @@ import { AppModule } from './app/app.module';
 import {SwaggerModule, DocumentBuilder} from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -14,6 +15,7 @@ async function bootstrap() {
 
   // middlewares
   app.use(cookieParser());
+  app.use(helmet());
 
   // global pipes
   app.useGlobalPipes(new ValidationPipe());
