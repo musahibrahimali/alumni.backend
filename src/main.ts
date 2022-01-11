@@ -5,18 +5,16 @@ import { AppModule } from './app/app.module';
 import {SwaggerModule, DocumentBuilder} from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
-import helmet from 'helmet';
 
-async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+// bootsrap the application
+const bootstrap = async () => {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { 
     cors: true,
-    logger: ['error', 'warn', 'debug', 'verbose']
+    logger: ['error', 'warn', 'debug', 'verbose'],
   });
 
   // middlewares
   app.use(cookieParser());
-  app.use(helmet());
-
   // global pipes
   app.useGlobalPipes(new ValidationPipe());
   const config = new DocumentBuilder()

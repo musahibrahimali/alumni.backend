@@ -6,12 +6,12 @@ import { ClientService } from '../client.service';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy){
-    constructor(private adminService: ClientService){
+    constructor(private clientService: ClientService){
         super();
     }
 
     async validate(username:string, password: string):Promise<IClient | any>{
-        const client = await this.adminService.validateClient(username, password);
+        const client = await this.clientService.validateClient(username, password);
         if(!client){
             throw new UnauthorizedException("There was an error validating user");
         }

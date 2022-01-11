@@ -41,7 +41,7 @@ export class Client{
 
     @IsString()
     @Prop({required: false, default: ["user"]})
-    roles: [string];
+    roles: string[];
 
     @IsBoolean()
     @Prop({required: false, default: false })

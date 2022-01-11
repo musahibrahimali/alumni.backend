@@ -1,0 +1,1 @@
+export type createClientResType = {access_token: string | {status:string, message:string}};
