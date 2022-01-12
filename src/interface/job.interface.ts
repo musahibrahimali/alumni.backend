@@ -1,12 +1,15 @@
 import { Document } from "mongoose";
 
 interface IJob extends Document{
-    readonly title: string;
-    readonly url: string;
-    readonly snippet: string;
-    readonly details: string;
-    readonly date: string;
-    readonly logo: string | any;
+    readonly jobTitle: string; 
+    readonly jobDescription: string;
+    readonly jobSnippet: string; 
+    readonly expireDate: string; 
+    readonly jobLocation: string;
+    readonly companyName: string;
+    readonly companyUrl: string;
+    readonly companyLogo?: string;
+    readonly images?:string[];
 }
 
 export default IJob;

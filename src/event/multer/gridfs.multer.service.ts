@@ -17,7 +17,7 @@ export class GridFsMulterConfigService implements MulterOptionsFactory {
                 const __filename = `${Date.now()}-${fileName}`;
                 return {
                     filename: __filename,
-                    bucketName: 'clientProfilePictures',
+                    bucketName: 'eventMedia',
                 };
             },
         });

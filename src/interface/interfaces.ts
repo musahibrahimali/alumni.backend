@@ -4,4 +4,5 @@ export {default as IEvent} from './event.interface';
 export {default as IJob} from './job.interface';
 export {default as ITroll} from './troll.interface';
 export {default as INews} from './news.interface';
+export {default as IBlog} from './blog.interface';
 // export {IPolicyHandler,PolicyHandler} from './casl.interface';

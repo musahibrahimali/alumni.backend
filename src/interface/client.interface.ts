@@ -9,7 +9,6 @@ interface IClient extends Document {
     readonly password?: string;
     readonly image?: string;
     readonly salt?: string;
-    readonly previousImages?: string[];
     readonly roles?: string[],
     readonly isAdmin?: boolean,
 }

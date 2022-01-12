@@ -1,10 +1,14 @@
 import { Document } from "mongoose";
 
 interface IEvent extends Document{
-    readonly title: string;
-    readonly details: string;
-    readonly date: string;
-    readonly image: string | any;
+    readonly eventTitle: string; 
+    readonly eventDescription: string;
+    readonly eventSnippet: string; 
+    readonly eventDate: Date; 
+    readonly eventTime: Date; 
+    readonly eventVenue: string;
+    readonly images?:string[];
+    readonly videos?:string[];
 }
 
 export default IEvent;
