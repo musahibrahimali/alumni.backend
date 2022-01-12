@@ -22,24 +22,28 @@ export class ClientService {
     }
 
     // register client
-    async registerClient(createClientDto: CreateCLientDto): Promise<string | {status:string, message:string}>{
-        createClientDto.email = createClientDto.username;
-        createClientDto.displayName = createClientDto.firstName + " " + createClientDto.lastName;
-        const _client = await this.creaateClient(createClientDto);
-        if(_client._id){
-            const payload = { username: _client.username, sub: _client._id };
-            return this.jwtService.sign(payload);
-        }
-        return {
-            status: "error",
-            message: "Email already exists"
+    async registerClient(createClientDto: CreateCLientDto): Promise<string>{
+        try{
+            createClientDto.email = createClientDto.username;
+            createClientDto.displayName = createClientDto.firstName + " " + createClientDto.lastName;
+            const _client = await this.creaateClient(createClientDto);
+            if(_client._id){
+                const payload = { username: _client.username, sub: _client._id };
+                return this.jwtService.sign(payload);
+            }
+        }catch(error){
+            return error;
         }
     }
 
     // log in user
     async loginClient(user:any): Promise<string>{
-        const payload = { username: user.email, sub: user.userId };
-        return this.jwtService.sign(payload);
+        try{
+            const payload = { username: user.email, sub: user.clientId };
+            return this.jwtService.sign(payload);
+        }catch(error){
+            return error;
+        }
     }
 
     // update client profile
@@ -48,7 +52,7 @@ export class ClientService {
     }
 
     // get user profile
-    async getProfile(id: string): Promise<ProfileInfoDto | undefined>{
+    async getProfile(id: string): Promise<ProfileInfoDto>{
         const client = await this.getClientProfile(id);
         if(client === undefined) {
             return undefined;
@@ -90,12 +94,21 @@ export class ClientService {
     }
 
     // validate client
-    async validateClient(email: string, password: string):Promise<ProfileInfoDto|undefined>{
+    async validateClient(email: string, password: string):Promise<ProfileInfoDto>{
         const client = await this.findOne(email, password);
         if(client === undefined) {
             return undefined;
         }
         return client;
+    }
+
+    // validate google client
+    async validateSocialClient(socialId: string, user:CreateCLientDto): Promise<IClient>{
+        const client = await this.clientModel.findOne({socialId: socialId});
+        if(client._id) {
+            return client;
+        }
+        return await this.clientModel.create(user);
     }
 
     /* Private methods */
@@ -135,7 +148,7 @@ export class ClientService {
     }
 
     // find one client (user)
-    private async findOne(email: string, password:string): Promise<ProfileInfoDto | undefined> {
+    private async findOne(email: string, password:string): Promise<ProfileInfoDto> {
         try{
             const client = await this.clientModel.findOne({email: email});
             if(!client) {
@@ -165,7 +178,7 @@ export class ClientService {
     }
 
     // get the profile of a  client (user)
-    private async getClientProfile(id: string): Promise<ProfileInfoDto | undefined> {
+    private async getClientProfile(id: string): Promise<ProfileInfoDto> {
         try{
             const client = await this.clientModel.findOne({_id: id});
             if(!client) {

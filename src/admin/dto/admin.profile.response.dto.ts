@@ -1,5 +1,4 @@
-export class ProfileInfoDto {
-    socialId: string;
+export class AdminProfileInfoDto {
     userId: any;
     email: string;
     displayName: string;

@@ -1,11 +1,11 @@
 export class CreateJobDto{
-    jobTitle: string; 
-    jobDescription: string;
-    jobSnippet: string; 
+    title: string; 
+    details: string;
+    snippet: string; 
     expireDate: string; 
-    jobLocation: string;
-    companyName: string;
-    companyUrl: string;
-    companyLogo?: string;
+    location: string;
+    company: string;
+    url: string;
+    logo?: string;
     images?:string[];
 }

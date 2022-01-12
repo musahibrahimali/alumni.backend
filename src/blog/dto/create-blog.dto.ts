@@ -1,9 +1,9 @@
 export class CreateBlogDto{
-    blogTitle: string;
-    blogDescription: string;
-    blogSnippet: string; 
-    blogCategory: string;
-    blogDate?: string; 
+    title: string;
+    details: string;
+    snippet: string; 
+    category: string;
+    date?: Date; 
     images?: string[]; 
     videos?: string[]; 
     comments?: string[]; 

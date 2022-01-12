@@ -1,10 +1,11 @@
 export class CreateEventDto{
-    eventTitle: string; 
-    eventDescription: string;
-    eventSnippet: string; 
-    eventDate: Date; 
-    eventTime: Date; 
-    eventVenue: string;
+    title: string; 
+    details: string;
+    snippet: string; 
+    startDate: Date; 
+    endDate: Date; 
+    time: Date; 
+    venue: string;
     images?:string[];
     videos?:string[];
 }

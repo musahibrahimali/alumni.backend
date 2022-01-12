@@ -20,7 +20,6 @@ import { JwtAuthGuard } from '../authorization/guards/jwt-auth.guard';
 import { ProfileInfoDto } from './dto/profile.response.dto';
 import { ClientParamDto } from './dto/client.id.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { createClientResType } from './types/response.types';
 import { boolean } from 'joi';
 import { ConfigService } from '@nestjs/config';
 
@@ -34,7 +33,7 @@ export class ClientController {
 
     @ApiCreatedResponse({type: String})
     @Post('register')
-    async registerClient(@Body() createClientDto: CreateCLientDto, @Response({passthrough: true}) response): Promise<createClientResType>{
+    async registerClient(@Body() createClientDto: CreateCLientDto, @Response({passthrough: true}) response): Promise<{access_token: string}>{
         const {
             username, password, firstName, lastName, displayName,
         } = createClientDto;

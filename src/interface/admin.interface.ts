@@ -1,6 +1,7 @@
 import { Document } from "mongoose";
 
 interface IAdmin extends Document{
+    readonly _id?: string;
     readonly username: string;
     readonly password: string;
     readonly email?: string;
@@ -15,6 +16,8 @@ interface IAdmin extends Document{
     readonly image?: string | any;
     readonly roles: string[];
     readonly isAdmin: boolean;
+    readonly createdAt?: Date;
+    readonly updatedAt?: Date;
 }
 
 export default IAdmin;

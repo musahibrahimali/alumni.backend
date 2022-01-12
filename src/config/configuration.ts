@@ -8,10 +8,5 @@ export default () => ({
     domain: process.env.DOMAIN,
     database: {
         host: process.env.DB_URL,
-    },
-    passport:{
-        google:{},
-        facebook:{},
-    },
-    
+    },    
 });

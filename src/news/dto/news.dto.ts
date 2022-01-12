@@ -1,7 +1,7 @@
 export class CreateNewsDto{
-    newsTitle: string;
-    newsSnippet: string;
-    newsDescription: string;
+    title: string;
+    snippet: string;
+    details: string;
     images?: string[];
     videos?: string[];
 }

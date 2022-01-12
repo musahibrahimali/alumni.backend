@@ -1,10 +1,15 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Transform } from "class-transformer";
 import { IsBoolean, IsString } from "class-validator";
+import { ObjectId } from "mongoose";
 
 export type ClientModel = Client & Document;
 
 @Schema({timestamps: true })
 export class Client{
+    @Transform(({ value }) => value.toString())
+    _id: ObjectId;
+
     @IsString()
     @Prop({required: false, default: '' })
     socialId: string;

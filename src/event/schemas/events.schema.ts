@@ -1,10 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IsDate, IsString } from 'class-validator';
+import { ObjectId } from 'mongoose';
+import { Transform } from 'class-transformer';
 
 export type EventsModel = Event & Document;
 
 @Schema({timestamps: true })
 export class Event{
+    @Transform(({ value }) => value.toString())
+    _id: ObjectId;
+
     @IsString()
     @Prop({required: true})
     title: string
@@ -29,7 +34,11 @@ export class Event{
 
     @IsDate()
     @Prop({required:true})
-    date: Date
+    startDate: Date
+
+    @IsDate()
+    @Prop({required:true})
+    endDate: Date
 
     @IsDate()
     @Prop({required:true})
