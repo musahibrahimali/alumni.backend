@@ -5,9 +5,9 @@ interface IEvent extends Document{
     readonly title: string; 
     readonly details: string;
     readonly snippet: string; 
-    readonly startDate: Date; 
-    readonly endDate: Date; 
-    readonly time: Date; 
+    readonly startDate: string; 
+    readonly endDate: string; 
+    readonly time: string; 
     readonly venue: string;
     readonly images?:string[];
     readonly videos?:string[];

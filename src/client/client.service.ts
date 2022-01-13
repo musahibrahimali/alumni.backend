@@ -39,7 +39,7 @@ export class ClientService {
     // log in user
     async loginClient(user:any): Promise<string>{
         try{
-            const payload = { username: user.email, sub: user.clientId };
+            const payload = { username: user.email, sub: user.userId };
             return this.jwtService.sign(payload);
         }catch(error){
             return error;
@@ -148,7 +148,7 @@ export class ClientService {
     }
 
     // find one client (user)
-    private async findOne(email: string, password:string): Promise<ProfileInfoDto> {
+    private async findOne(email: string, password:string): Promise<ProfileInfoDto | any> {
         try{
             const client = await this.clientModel.findOne({email: email});
             if(!client) {
@@ -159,17 +159,16 @@ export class ClientService {
             if(!isPasswordValid) {
                 return null;
             }
-            const profileImage = await Promise.resolve(this.readStream(client.image));
+            const defaultImage = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
+            let profileImage: string;
+            if(client.image === defaultImage){
+                profileImage = defaultImage;
+            }else{
+                profileImage = await Promise.resolve(this.readStream(client.image));
+            }
             const userData = {
-                socialId: client.socialId,
-                userId: client._id,
-                email: client.email,
-                displayName: client.displayName,
-                firstName: client.firstName,
-                lastName: client.lastName,
+                ...client.toObject(),
                 image : profileImage,
-                isAdmin: client.isAdmin,
-                roles: client.roles,
             }
             return userData;
         }catch(err){
@@ -178,23 +177,22 @@ export class ClientService {
     }
 
     // get the profile of a  client (user)
-    private async getClientProfile(id: string): Promise<ProfileInfoDto> {
+    private async getClientProfile(id: string): Promise<IClient | any> {
         try{
             const client = await this.clientModel.findOne({_id: id});
             if(!client) {
                 return undefined;
             }
-            const profileImage = await Promise.resolve(this.readStream(client.image));
+            const defaultImage = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
+            let profileImage: string;
+            if(client.image === defaultImage){
+                profileImage = defaultImage;
+            }else{
+                profileImage = await Promise.resolve(this.readStream(client.image));
+            }
             const userData = {
-                socialId: client.socialId,
-                userId: client._id,
-                email: client.email,
-                displayName: client.displayName,
-                firstName: client.firstName,
-                lastName: client.lastName,
+                ...client.toObject(),
                 image : profileImage,
-                isAdmin: client.isAdmin,
-                roles: client.roles,
             }
             return userData;
         }catch(err){
@@ -222,18 +220,8 @@ export class ClientService {
     // update profile
     private async updateClientProfile(id: string, updateClientDto: CreateCLientDto): Promise<ProfileInfoDto>{
         // find and update the client
-        const updatedClient = await this.clientModel.findOneAndUpdate({_id: id}, updateClientDto, {new: true});
-        const userData = {
-            socialId: updatedClient.socialId,
-            userId: updatedClient._id,
-            email: updatedClient.email,
-            displayName: updatedClient.displayName,
-            firstName: updatedClient.firstName,
-            lastName: updatedClient.lastName,
-            image : updatedClient.image,
-            isAdmin: updatedClient.isAdmin,
-            roles: updatedClient.roles,
-        }
+        await this.clientModel.findOneAndUpdate({_id: id}, updateClientDto, {new: true});
+        const userData = await this.getClientProfile(id);
         return userData;
     }
 

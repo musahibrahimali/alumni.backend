@@ -3,7 +3,7 @@ import { JobService } from './job.service';
 import IJob from '../interface/job.interface';
 import { CreateJobDto } from './dto/create-job.dto';
 import { ApiOkResponse, ApiConsumes } from '@nestjs/swagger';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('job')
 export class JobController {
@@ -13,11 +13,13 @@ export class JobController {
     @Post('create-job')
     @ApiOkResponse({ type: CreateJobDto, isArray: false, description: 'Job created successfully' })
     @ApiConsumes('multipart/form-data')
-    @UseInterceptors(FileFieldsInterceptor([
-        { name: 'images', maxCount: 10 },
-        { name: 'videos', maxCount: 10 },
-    ]))
-    async createJob(@UploadedFiles() files: { images?: Express.Multer.File[] | any, videos?: Express.Multer.File[] | any }, @Body() createJobDto: CreateJobDto): Promise<IJob> {
+    @UseInterceptors(FileInterceptor('images'))
+    async createJob(@UploadedFiles() files: Express.Multer.File[] | any, @Body() createJobDto: CreateJobDto): Promise<IJob> {
+        let imageIds: string[] = [];
+        // get all image ids if images is not empty
+        if(files.images) {
+            imageIds = files.images.map(image => image.id);
+        }
         const {
             title:jobTitle, 
             details:jobDescription,
@@ -37,6 +39,7 @@ export class JobController {
             logo:companyLogo,
             company:companyName,
             url:companyUrl,
+            images: imageIds,
         }
         return await this.jobService.createJob(jobDto);
     }
@@ -64,8 +67,15 @@ export class JobController {
 
     // update job
     @Patch('update-job/:id')
+    @ApiConsumes('multipart/form-data')
+    @UseInterceptors(FileInterceptor('images'))
     @ApiOkResponse({ type: CreateJobDto, isArray: false, description: 'Job updated successfully' })
-    async updateJob(@Param('id') id: string, @Body() createJobDto: CreateJobDto): Promise<IJob> {
+    async updateJob(@UploadedFiles() files: Express.Multer.File[] | any, @Param('id') id: string, @Body() createJobDto: CreateJobDto): Promise<IJob> {
+        let imageIds: string[] = [];
+        // get all image ids if images is not empty
+        if(files.images) {
+            imageIds = files.images.map(image => image.id);
+        }
         const {
             title:jobTitle, 
             details:jobDescription,
@@ -85,6 +95,7 @@ export class JobController {
             logo:companyLogo,
             company:companyName,
             url:companyUrl,
+            images: imageIds,
         }
         return await this.jobService.updateJob(id, jobDto);
     }

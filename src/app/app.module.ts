@@ -12,6 +12,7 @@ import * as Joi from 'joi';
 import { NewsModule } from '../news/news.module';
 import { ClientModule } from '../client/client.module';
 import { AdminModule } from '../admin/admin.module';
+import { BlogModule } from '../blog/blog.module';
 
 @Module({
   imports: [
@@ -43,6 +44,8 @@ import { AdminModule } from '../admin/admin.module';
     EventModule,
     JobModule,
     NewsModule,
+    BlogModule,
+    TrollModule,
   ],
   controllers: [AppController],
   providers: [

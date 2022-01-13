@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document, ObjectId } from 'mongoose';
 import * as mongoose from 'mongoose';
-import { Client } from '../../client/schemas/client.schema';
-import { Troll } from './troll.schema';
 import { Type, Transform } from 'class-transformer';
+import { Troll } from "src/troll/schemas/troll.schema";
+import { Client } from "src/client/schemas/client.schema";
 
 export type TrollShareModel = TrollShare & Document;
 
@@ -16,8 +16,8 @@ export class TrollShare {
     @Type(() => Client)
     user: Client;
 
-    @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: Troll.name  })
-    @Type(() => Troll) 
+    @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: "Troll" })
+    @Type(() => Troll)
     troll: Troll;
 }
 

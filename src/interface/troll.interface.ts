@@ -1,7 +1,7 @@
-import { Document } from "mongoose";
+import { Document, ObjectId } from 'mongoose';
 
 interface ITroll extends Document{
-    readonly _id?: string;
+    readonly _id?: ObjectId;
     readonly post?: string;
     readonly userId?: string;
     readonly images?: string[];

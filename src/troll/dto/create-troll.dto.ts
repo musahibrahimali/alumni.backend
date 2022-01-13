@@ -1,6 +1,6 @@
 export class CreateTrollDto{
     post?: string;
-    userId?: string;
+    user?: string;
     images?: string[];
     videos?: string[];
     likes?: any[];

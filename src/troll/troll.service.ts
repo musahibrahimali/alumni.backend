@@ -8,25 +8,32 @@ import { CreateTrollDto } from './dto/create-troll.dto';
 import { TrollShareDto } from './dto/share.dto';
 import { TrollLikeDto } from './dto/like.dto';
 import { TrollCommentDto } from './dto/comment.dto';
-import { TrollLike, TrollLikeModel } from './schemas/troll.like.schema';
-import { TrollComment, TrollCommentModel } from './schemas/troll.comment.schema';
-import { TrollShare, TrollShareModel } from './schemas/troll.share.schema';
+import {ITroll} from '../interface/interfaces';
+import { ClientService } from '../client/client.service';
+// import { TrollComment } from '../trollcomment/schemas/troll.comment.schema';
+// import { TrollLike } from '../trolllike/schemas/troll.like.schema';
+// import { TrollShare } from '../trollshare/schemas/troll.share.schema';
+import { TrolllikeService } from '../trolllike/trolllike.service';
+import { TrollshareService } from '../trollshare/trollshare.service';
+import { TrollcommentService } from '../trollcomment/trollcomment.service';
+// import { Client } from '../client/schemas/client.schema';
 
 @Injectable()
 export class TrollService {
     private fileModel: MongoGridFS;
     constructor(
         @InjectModel(Troll.name) private trollModel:Model<TrollModel>,
-        @InjectModel(TrollLike.name) private trollLikeModel:Model<TrollLikeModel>,
-        @InjectModel(TrollComment.name) private trollCommentModel:Model<TrollCommentModel>,
-        @InjectModel(TrollShare.name) private trollShareModel:Model<TrollShareModel>,
         @InjectConnection() private readonly connection: Connection,
+        private clientService: ClientService,
+        private trollLikeService: TrolllikeService,
+        private trollShareService: TrollshareService,
+        private trollCommentService: TrollcommentService,
     ) {
         this.fileModel = new MongoGridFS(this.connection.db, 'newsMedia');
     }
 
     // create a new troll
-    async create(createTroll: CreateTrollDto): Promise<Troll> {
+    async createTroll(createTroll: CreateTrollDto): Promise<ITroll | any> {
         try{
             return await this.trollModel.create(createTroll);
         }catch(error){
@@ -35,7 +42,7 @@ export class TrollService {
     }
 
     // get all the trolls
-    async findAll(): Promise<Troll[]> {
+    async findAll(): Promise<ITroll[]> {
         try{
             const allTrolls = [];
             const trolls = await this.trollModel.find().sort({createdAt: -1});
@@ -43,6 +50,10 @@ export class TrollService {
                 // get all image and video id's
                 const imageIds = troll.images.map(image => image);
                 const videoIds = troll.videos.map(video => video);
+                // get the user id
+                const clientId = troll.user.toString();
+                // get the user profile
+                const user = await this.clientService.getProfile(clientId);
                 // get all image and video data
                 const images = await Promise.all(imageIds.map(async (id) => await this.readStream(id)));
                 const videos = await Promise.all(videoIds.map(async (id) => await this.readStream(id)));
@@ -51,6 +62,7 @@ export class TrollService {
                     ...troll.toObject(),
                     images: images,
                     videos: videos,
+                    user: user,
                 }
                 // add the troll to the array
                 allTrolls.push(trollWithData);
@@ -62,7 +74,7 @@ export class TrollService {
     }
 
     // find troll by id
-    async findById(id: string): Promise<Troll> {
+    async findById(id: string): Promise<ITroll | any> {
         try{
             const troll = await this.trollModel.findById(id);
             // get all image and video id's
@@ -84,7 +96,7 @@ export class TrollService {
     }
 
     // update troll
-    async update(id: string, createTroll: CreateTrollDto): Promise<Troll> {
+    async updateTroll(id: string, createTroll: CreateTrollDto): Promise<ITroll | any> {
         try{
             const troll = await this.trollModel.findByIdAndUpdate(id, createTroll, {new: true});
             return troll;
@@ -94,50 +106,68 @@ export class TrollService {
     }
 
     // update the likes of a troll
-    async updateLikes(id: string, like: TrollLikeDto): Promise<Troll> {
+    async updateLikes(id: string, like: TrollLikeDto): Promise<ITroll | any> {
         try{
-            // find the troll
-            const troll = await this.trollModel.findOne({_id: id});
-            // update the likes with the new like object
-            const updatedTroll = await this.trollModel.findByIdAndUpdate(id, {likes: [...troll.likes, like]}, {new: true});
-            // save the updated troll
-            return await updatedTroll.save();
+            // create like in the like service
+            const trollLike = await this.trollLikeService.likeTroll(like);
+            // add the like to the troll
+            const troll = await this.trollModel.findByIdAndUpdate(id, {$push: {likes: trollLike._id}}, {new: true});
+            return troll;
         }catch(error){
             return error;
         }
     }
 
     // upadate the comments of a troll
-    async updateComments(id: string, comment: TrollCommentDto): Promise<Troll> {
+    async updateComments(id: string, comment: TrollCommentDto): Promise<ITroll | any> {
         try{
-            // find the troll
-            const troll = await this.trollModel.findOne({_id: id});
-            // update the comments with the new comment object
-            const updatedTroll = await this.trollModel.findByIdAndUpdate(id, {comments: [...troll.comments, comment]}, {new: true});
-            // save the updated troll
-            return await updatedTroll.save();
+            const trollComment = await this.trollCommentService.commentTroll(comment);
+            // add the comment to the troll
+            const troll = await this.trollModel.findByIdAndUpdate(id, {$push: {comments: trollComment._id}}, {new: true});
+            return troll;
         }catch(error){
             return error;
         }
     }
 
     // delete the comment
-    async deleteComment(id: string, commentId: string): Promise<Troll |any> {
-        return "";
+    async deleteComment(id: string, commentId: string): Promise<boolean> {
+        try{
+            // delete the comment
+            // delete the comment from the comment service
+            await this.trollCommentService.deleteTrollComment(commentId);
+            await this.trollModel.findByIdAndUpdate(id, {$pull: {comments: commentId}}, {new: true});
+            return true;
+        }catch(error){
+            return error;
+        }
     }
 
     // delete the like
-    async deleteLike(id: string, likeId: string): Promise<Troll | any> {
-        return "";
+    async deleteLike(id: string, likeId: string): Promise<boolean> {
+        try{
+            // delete the like from the like service
+            await this.trollLikeService.unlikeTroll(likeId);
+            // delete the like
+            await this.trollModel.findByIdAndUpdate(id, {$pull: {likes: likeId}}, {new: true});
+            return true;
+        }catch(error){
+            return error;
+        }
     }
 
     // update shared status of the troll
     async updateShared(id: string, shared: TrollShareDto): Promise<Troll | any> {
-        return "";
+        try{
+            const shareTroll = await this.trollShareService.shareTroll(shared);
+            return shareTroll;
+        }catch(error){
+            return error;
+        }
     }
 
     // delete the troll
-    async delete(id: string): Promise<boolean> {
+    async deleteTroll(id: string): Promise<boolean> {
         try{
             const troll = await this.trollModel.findById(id);
             // delete all images and videos

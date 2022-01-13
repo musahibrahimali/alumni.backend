@@ -18,9 +18,16 @@ export class NewsController {
         { name: 'videos', maxCount: 10 },
     ]))
     async createNews(@UploadedFiles() files: { images?: Express.Multer.File[] | any, videos?: Express.Multer.File[] | any }, @Body() createNewsDto: CreateNewsDto): Promise<INews> {
-        // get all image ids
-        const imageIds = files.images.map(image => image.id);
-        const videosIds = files.videos.map(video => video.id);
+        let imageIds: string[] = [];
+        let videoIds: string[] = [];
+        // get all image ids if images is not empty
+        if(files.images) {
+            imageIds = files.images.map(image => image.id);
+        }
+        if(files.videos) {
+            // get all video ids
+            videoIds = files.videos.map(video => video.id);
+        }
         const {
             title:newsTitle, 
             details:newsDescription,
@@ -31,7 +38,7 @@ export class NewsController {
             details:newsDescription,
             snippet:newsSnippet,
             images: imageIds,
-            videos: videosIds,
+            videos: videoIds,
         }
         return await this.newsService.createNews(newsDto);
     }

@@ -18,10 +18,16 @@ export class BlogController {
         { name: 'videos', maxCount: 10 },
     ]))
     async createBlog(@UploadedFiles() files: { images?: Express.Multer.File[] | any, videos?: Express.Multer.File[] | any }, @Body() createBlogDto: CreateBlogDto):Promise<IBlog> {
-        // get all image ids
-        const imageIds = files.images.map(image => image.id);
-        // get all video ids
-        const videoIds = files.videos.map(video => video.id);
+        let imageIds: string[] = [];
+        let videoIds: string[] = [];
+        // get all image ids if images is not empty
+        if(files.images) {
+            imageIds = files.images.map(image => image.id);
+        }
+        if(files.videos) {
+            // get all video ids
+            videoIds = files.videos.map(video => video.id);
+        }
         const {
             title: blogTitle,
             details: blogDescription,
@@ -58,10 +64,16 @@ export class BlogController {
         { name: 'videos', maxCount: 10 },
     ]))
     async updateBlog(@UploadedFiles() files: { images?: Express.Multer.File[] | any, videos?: Express.Multer.File[] | any }, @Body() createBlogDto: CreateBlogDto, @Param('id') id: string):Promise<IBlog> {
-        // get all image ids
-        const imageIds = files.images.map(image => image.id);
-        // get all video ids
-        const videoIds = files.videos.map(video => video.id);
+        let imageIds: string[] = [];
+        let videoIds: string[] = [];
+        // get all image ids if images is not empty
+        if(files.images) {
+            imageIds = files.images.map(image => image.id);
+        }
+        if(files.videos) {
+            // get all video ids
+            videoIds = files.videos.map(video => video.id);
+        }
         const {
             title: blogTitle,
             details: blogDescription,

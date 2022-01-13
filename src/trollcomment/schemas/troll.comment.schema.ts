@@ -4,7 +4,7 @@ import { IsString } from "class-validator";
 import * as mongoose from 'mongoose';
 import { Client } from '../../client/schemas/client.schema';
 import { Type, Transform } from 'class-transformer';
-import { Troll } from './troll.schema';
+import { Troll } from "../../troll/schemas/troll.schema";
 
 export type TrollCommentModel = TrollComment & Document;
 
@@ -17,7 +17,7 @@ export class TrollComment {
     @Type(() => Client)
     user: Client;
 
-    @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: Troll.name  })
+    @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: "Troll" })
     @Type(() => Troll) 
     troll: Troll;
 

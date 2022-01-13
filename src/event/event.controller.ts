@@ -18,10 +18,16 @@ export class EventController {
         { name: 'videos', maxCount: 10 },
     ]))
     async createEvent(@UploadedFiles() files: { images?: Express.Multer.File[] | any, videos?: Express.Multer.File[] | any },@Body() createEventDto: CreateEventDto,):Promise<IEvent> {
-        // get all image ids
-        const imageIds = files.images.map(image => image.id);
-        // get all video ids
-        const videoIds = files.videos.map(video => video.id);
+        let imageIds: string[] = [];
+        let videoIds: string[] = [];
+        // get all image ids if images is not empty
+        if(files.images) {
+            imageIds = files.images.map(image => image.id);
+        }
+        if(files.videos) {
+            // get all video ids
+            videoIds = files.videos.map(video => video.id);
+        }
         const {
             title:eventTitle, 
             details:eventDescription,
@@ -61,10 +67,16 @@ export class EventController {
         { name: 'videos', maxCount: 10 },
     ]))
     async updateEvent(@UploadedFiles() files: { images?: Express.Multer.File[] | any, videos?: Express.Multer.File[] | any },@Body() createEventDto: CreateEventDto, @Param('id') id: string):Promise<IEvent> {
-        // get all image ids
-        const imageIds = files.images.map(image => image.id);
-        // get all video ids
-        const videoIds = files.videos.map(video => video.id);
+        let imageIds: string[] = [];
+        let videoIds: string[] = [];
+        // get all image ids if images is not empty
+        if(files.images) {
+            imageIds = files.images.map(image => image.id);
+        }
+        if(files.videos) {
+            // get all video ids
+            videoIds = files.videos.map(video => video.id);
+        }
         const {
             title:eventTitle, 
             details:eventDescription,

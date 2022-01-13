@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { IsDate, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
 import { ObjectId } from 'mongoose';
 import { Transform } from 'class-transformer';
 
@@ -32,17 +32,17 @@ export class Event{
     @Prop({required:false})
     videos: string[]
 
-    @IsDate()
+    @IsString()
     @Prop({required:true})
-    startDate: Date
+    startDate: string
 
-    @IsDate()
+    @IsString()
     @Prop({required:true})
-    endDate: Date
+    endDate: string
 
-    @IsDate()
+    @IsString()
     @Prop({required:true})
-    time: Date
+    time: string
 }
 
 export const EventsSchema = SchemaFactory.createForClass(Event);

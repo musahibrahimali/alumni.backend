@@ -11,14 +11,14 @@ export class Client{
     _id: ObjectId;
 
     @IsString()
-    @Prop({required: false, default: '' })
+    @Prop({required: false, unique: true, default: '' })
     socialId: string;
 
     @IsString()
     @Prop({ required: true, unique: true })
     username: string;
 
-    @Prop({ required: false })
+    @Prop({ required: false, select: false })
     password: string;
 
     @IsString()
@@ -34,11 +34,11 @@ export class Client{
     lastName: string;
 
     @IsString()
-    @Prop({required: false})
+    @Prop({required: false,unique: true})
     email: string;
 
     @IsString()
-    @Prop({required: false})
+    @Prop({required: false, select: false})
     salt: string;
 
     @Prop({required: false, default: 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'})
