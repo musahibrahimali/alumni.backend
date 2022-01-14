@@ -1,24 +1,21 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, ObjectId } from 'mongoose';
+import { Document } from 'mongoose';
 import { IsString } from "class-validator";
+import { Type } from "class-transformer";
+import { Client } from 'src/client/schemas/client.schema';
+import { Troll } from 'src/troll/schemas/troll.schema';
 import * as mongoose from 'mongoose';
-import { Client } from '../../client/schemas/client.schema';
-import { Type, Transform } from 'class-transformer';
-import { Troll } from "../../troll/schemas/troll.schema";
 
 export type TrollCommentModel = TrollComment & Document;
 
 @Schema({ timestamps: true })
 export class TrollComment {
-    @Transform(({ value }) => value.toString())
-    _id: ObjectId;
-
     @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: Client.name })
     @Type(() => Client)
     user: Client;
 
     @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: "Troll" })
-    @Type(() => Troll) 
+    @Type(() => Troll)
     troll: Troll;
 
     @IsString()

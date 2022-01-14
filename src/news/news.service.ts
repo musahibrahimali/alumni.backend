@@ -4,7 +4,7 @@ import { InjectModel, InjectConnection } from '@nestjs/mongoose';
 import { Model, Connection } from 'mongoose';
 import { NewsModel, New } from './schemas/news.schema';
 import { GridFSBucketReadStream } from 'mongodb';
-import INews from '../interface/news.interface';
+import {INews} from 'src/interface/interfaces';
 import { CreateNewsDto } from './dto/news.dto';
 
 @Injectable()

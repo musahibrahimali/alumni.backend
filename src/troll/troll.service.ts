@@ -8,15 +8,11 @@ import { CreateTrollDto } from './dto/create-troll.dto';
 import { TrollShareDto } from './dto/share.dto';
 import { TrollLikeDto } from './dto/like.dto';
 import { TrollCommentDto } from './dto/comment.dto';
-import {ITroll} from '../interface/interfaces';
-import { ClientService } from '../client/client.service';
-// import { TrollComment } from '../trollcomment/schemas/troll.comment.schema';
-// import { TrollLike } from '../trolllike/schemas/troll.like.schema';
-// import { TrollShare } from '../trollshare/schemas/troll.share.schema';
-import { TrolllikeService } from '../trolllike/trolllike.service';
-import { TrollshareService } from '../trollshare/trollshare.service';
-import { TrollcommentService } from '../trollcomment/trollcomment.service';
-// import { Client } from '../client/schemas/client.schema';
+import {ITroll} from 'src/interface/interfaces';
+import { ClientService } from 'src/client/client.service';
+import { TrolllikeService } from 'src/trolllike/trolllike.service';
+import { TrollshareService } from 'src/trollshare/trollshare.service';
+import { TrollcommentService } from 'src/trollcomment/trollcomment.service';
 
 @Injectable()
 export class TrollService {
@@ -29,7 +25,7 @@ export class TrollService {
         private trollShareService: TrollshareService,
         private trollCommentService: TrollcommentService,
     ) {
-        this.fileModel = new MongoGridFS(this.connection.db, 'newsMedia');
+        this.fileModel = new MongoGridFS(this.connection.db, 'trollMedia');
     }
 
     // create a new troll
@@ -47,6 +43,25 @@ export class TrollService {
             const allTrolls = [];
             const trolls = await this.trollModel.find().sort({createdAt: -1});
             for(const troll of trolls){
+                // get all the likes
+                const likes = await this.trollLikeService.getTrollLikes(troll._id);
+                // get all shares
+                const shares = await this.trollShareService.getTrollShares(troll._id);
+                // get all comments
+                const comments = await this.trollCommentService.getTrollComments(troll._id);
+                // get the id's of the users who commented
+                const commentUsers = comments.map(comment => comment.user);
+                // get the user details of the users who commented
+                const commentUsersDetails = await Promise.all(commentUsers.map(async (userId) => await this.clientService.getProfile(userId.toString())));
+                // add the details of each user to the comment
+                const commentsWithDetails = comments.map((comment:any, index) => ({
+                    _id: comment._id,
+                    troll: comment.troll,
+                    comment: comment.comment,
+                    user: commentUsersDetails[index],
+                    createdAt: comment.createdAt,
+                    updatedAt: comment.updatedAt,
+                }));  
                 // get all image and video id's
                 const imageIds = troll.images.map(image => image);
                 const videoIds = troll.videos.map(video => video);
@@ -63,6 +78,9 @@ export class TrollService {
                     images: images,
                     videos: videos,
                     user: user,
+                    likes: likes,
+                    shares: shares,
+                    comments: commentsWithDetails,
                 }
                 // add the troll to the array
                 allTrolls.push(trollWithData);
@@ -136,7 +154,7 @@ export class TrollService {
             // delete the comment
             // delete the comment from the comment service
             await this.trollCommentService.deleteTrollComment(commentId);
-            await this.trollModel.findByIdAndUpdate(id, {$pull: {comments: commentId}}, {new: true});
+            await (await this.trollModel.findByIdAndUpdate(id, {$pull: {comments: commentId}}, {new: true}));
             return true;
         }catch(error){
             return error;
@@ -157,10 +175,12 @@ export class TrollService {
     }
 
     // update shared status of the troll
-    async updateShared(id: string, shared: TrollShareDto): Promise<Troll | any> {
+    async updateShared(id: string, shared: TrollShareDto): Promise<ITroll | any> {
         try{
             const shareTroll = await this.trollShareService.shareTroll(shared);
-            return shareTroll;
+            // find the troll and add the share to it
+            const troll = await this.trollModel.findByIdAndUpdate(id, {$pull: {shares: shareTroll._id}});
+            return troll;
         }catch(error){
             return error;
         }

@@ -1,15 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IsString } from 'class-validator';
-import { ObjectId } from 'mongoose';
-import { Transform } from 'class-transformer';
 
 export type EventsModel = Event & Document;
 
 @Schema({timestamps: true })
 export class Event{
-    @Transform(({ value }) => value.toString())
-    _id: ObjectId;
-
     @IsString()
     @Prop({required: true})
     title: string

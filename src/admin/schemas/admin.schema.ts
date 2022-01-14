@@ -1,17 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IsEmail, IsPhoneNumber, IsString, IsBoolean } from 'class-validator';
-import { ObjectId } from 'mongoose';
-import { Transform } from 'class-transformer';
 
 export type AdminModel = Admin & Document;
 
 @Schema({timestamps: true })
 export class Admin{
-    @Transform(({ value }) => value.toString())
-    _id: ObjectId;
-
     @IsEmail()
-    @Prop({required:true})
+    @Prop({required:true, unique:true})
     username: string
     
     @IsString()
@@ -19,7 +14,7 @@ export class Admin{
     password: string
 
     @IsEmail()
-    @Prop({required:false})
+    @Prop({required:false, unique:true})
     email: string
 
     @IsString()

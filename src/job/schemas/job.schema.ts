@@ -1,15 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IsString } from 'class-validator';
-import { Transform } from 'class-transformer';
-import { ObjectId } from 'mongoose';
 
 export type JobModel = Job & Document;
 
 @Schema({timestamps: true })
 export class Job{
-
-    @Transform(({ value }) => value.toString())
-    _id: ObjectId;
 
     @IsString()
     @Prop({required: true})

@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { MongoGridFS } from 'mongo-gridfs';
 import { Model, Connection } from 'mongoose';
-import {IBlog} from '../interface/interfaces';
+import {IBlog} from 'src/interface/interfaces';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { Blog, BlogModel } from './schemas/blog.schema';
 import { GridFSBucketReadStream } from 'mongodb';

@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
-import {IClient} from '../interface/interfaces';
+import {IClient} from 'src/interface/interfaces';
 import { Client, ClientModel } from './schemas/client.schema';
 import { CreateCLientDto } from './dto/create-client.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -39,7 +39,7 @@ export class ClientService {
     // log in user
     async loginClient(user:any): Promise<string>{
         try{
-            const payload = { username: user.email, sub: user.userId };
+            const payload = { username: user.email, sub: user._id };
             return this.jwtService.sign(payload);
         }catch(error){
             return error;
@@ -105,10 +105,20 @@ export class ClientService {
     // validate google client
     async validateSocialClient(socialId: string, user:CreateCLientDto): Promise<IClient>{
         const client = await this.clientModel.findOne({socialId: socialId});
-        if(client._id) {
+        const emailClient = await this.clientModel.findOne({username: user.username});
+        if(client) {
             return client;
         }
+        if(emailClient) {
+            return emailClient;
+        }
         return await this.clientModel.create(user);
+    }
+
+    // sign token for social login
+    async signToken(user: IClient): Promise<string> {
+        const payload = { username: user.username, sub: user._id };
+        return this.jwtService.sign(payload);
     }
 
     /* Private methods */
@@ -123,7 +133,7 @@ export class ClientService {
     private async creaateClient(createClientDto: CreateCLientDto): Promise<IClient | any> {
         try{
             // check if email already exists
-            const emailExists = await this.clientModel.findOne({email: createClientDto.username});
+            const emailExists = await this.clientModel.findOne({username: createClientDto.username});
             if(emailExists){
                 return {
                     status: "error",
@@ -150,7 +160,7 @@ export class ClientService {
     // find one client (user)
     private async findOne(email: string, password:string): Promise<ProfileInfoDto | any> {
         try{
-            const client = await this.clientModel.findOne({email: email});
+            const client = await this.clientModel.findOne({username: email});
             if(!client) {
                 return undefined;
             }
@@ -163,12 +173,16 @@ export class ClientService {
             let profileImage: string;
             if(client.image === defaultImage){
                 profileImage = defaultImage;
+            }else if(client.socialId.length > 0) {
+                profileImage = client.image;
             }else{
                 profileImage = await Promise.resolve(this.readStream(client.image));
             }
             const userData = {
                 ...client.toObject(),
                 image : profileImage,
+                password: "",
+                salt: "",
             }
             return userData;
         }catch(err){
@@ -187,12 +201,16 @@ export class ClientService {
             let profileImage: string;
             if(client.image === defaultImage){
                 profileImage = defaultImage;
+            }else if(client.socialId.length > 0){
+                profileImage = client.image;
             }else{
                 profileImage = await Promise.resolve(this.readStream(client.image));
             }
             const userData = {
                 ...client.toObject(),
                 image : profileImage,
+                password: "",
+                salt: "",
             }
             return userData;
         }catch(err){

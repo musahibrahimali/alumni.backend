@@ -1,17 +1,30 @@
-import { Body, Controller, Post, UploadedFiles, UseInterceptors, Get, Param, Patch, Delete } from '@nestjs/common';
+import { 
+    Body, 
+    Controller, 
+    Post, 
+    UploadedFiles, 
+    UseInterceptors, 
+    Get, 
+    Param, 
+    Patch, 
+    Delete, 
+    UseGuards
+} from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes, ApiOkResponse } from '@nestjs/swagger';
 import { BlogService } from './blog.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
-import IBlog from '../interface/blog.interface';
+import {IBlog} from 'src/interface/interfaces';
+import { JwtAuthGuard } from 'src/authorization/authorizations';
 
 @Controller('blog')
 export class BlogController {
     constructor(private blogService: BlogService) {}
 
     // create a new blog
-    @Post('create-blog')
+    @UseGuards(JwtAuthGuard)
     @ApiOkResponse({ type: CreateBlogDto, isArray: false, description: 'Blog created successfully' })
+    @Post('create-blog')
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(FileFieldsInterceptor([
         { name: 'images', maxCount: 10 },
@@ -49,15 +62,16 @@ export class BlogController {
     }
 
     // get all blogs
-    @Get('get-blogs')
     @ApiOkResponse({ type: CreateBlogDto, isArray: true })
+    @Get('get-blogs')
     async getBlogs():Promise<IBlog[]> {
         return await this.blogService.getBlogs();
     }
 
     // update a blog
-    @Patch('update-blog/:id')
+    @UseGuards(JwtAuthGuard)
     @ApiOkResponse({ type: CreateBlogDto, isArray: false, description: 'Blog updated successfully' })
+    @Patch('update-blog/:id')
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(FileFieldsInterceptor([
         { name: 'images', maxCount: 10 },
@@ -95,22 +109,23 @@ export class BlogController {
     }
 
     // find blog by id
-    @Get('find-blog-by-id/:id')
     @ApiOkResponse({ type: CreateBlogDto, isArray: false })
+    @Get('find-blog-by-id/:id')
     async findBlogById(@Param('id') id: string):Promise<IBlog> {
         return await this.blogService.findBlogById(id);
     }
 
     // find blog by title
-    @Get('find-blog-by-title/:title')
     @ApiOkResponse({ type: CreateBlogDto, isArray: false })
+    @Get('find-blog-by-title/:title')
     async findBlogByTitle(@Param('title') title: string):Promise<IBlog> {
         return await this.blogService.findBlogByTitle(title);
     }
 
     // delete a blog
-    @Delete('delete-blog/:id')
+    @UseGuards(JwtAuthGuard)
     @ApiOkResponse({ type: CreateBlogDto, isArray: false, description: 'Blog deleted successfully' })
+    @Delete('delete-blog/:id')
     async deleteBlog(@Param('id') id: string):Promise<boolean> {
         return await this.blogService.deleteBlog(id);
     }

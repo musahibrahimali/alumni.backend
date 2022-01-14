@@ -4,7 +4,7 @@ import { InjectModel, InjectConnection } from '@nestjs/mongoose';
 import { Job, JobModel } from './schemas/job.schema';
 import { Model, Connection } from 'mongoose';
 import { GridFSBucketReadStream } from 'mongodb';
-import {IJob} from '../interface/interfaces';
+import {IJob} from 'src/interface/interfaces';
 import { CreateJobDto } from './dto/create-job.dto';
 
 @Injectable()

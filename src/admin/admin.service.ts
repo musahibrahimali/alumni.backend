@@ -5,10 +5,10 @@ import { Model, Connection } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Admin, AdminModel } from './schemas/admin.schema';
 import { GridFSBucketReadStream } from 'mongodb';
-import * as bcrypt from 'bcrypt';
 import { CreateAdminDto } from './dto/create-admin.dto';
-import IAdmin from '../interface/admin.interface';
+import IAdmin from 'src/interface/admin.interface';
 import { AdminProfileInfoDto } from './dto/admin.profile.response.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AdminService {
@@ -22,12 +22,8 @@ export class AdminService {
     }
 
     // register new admin
-    async register(createAdminDto: CreateAdminDto): Promise<string> {
+    async registerAdmin(createAdminDto: CreateAdminDto): Promise<string> {
         try{
-            // set the username to the email
-            createAdminDto.email = createAdminDto.username;
-            // set the display name
-            createAdminDto.displayName = createAdminDto.firstName + ' ' + createAdminDto.lastName;
             const _admin = await this.creaateAdmin(createAdminDto);
             if(_admin._id){
                 const payload = { username: _admin.username, sub: _admin._id };
@@ -41,7 +37,7 @@ export class AdminService {
     // log in admin
     async loginAdmin(user:any): Promise<string> {
         try{
-            const payload = { username: user.username, sub: user.adminId };
+            const payload = { username: user.username, sub: user._id };
             return this.jwtService.sign(payload);
         }catch(error){
             return error;

@@ -5,10 +5,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Troll, TrollSchema } from './schemas/troll.schema';
 import { MulterModule } from '@nestjs/platform-express';
 import { GridFsMulterConfigService } from './multer/gridfs.multer.service';
-import { ClientModule } from '../client/client.module';
-import { TrolllikeModule } from '../trolllike/trolllike.module';
-import { TrollcommentModule } from '../trollcomment/trollcomment.module';
-import { TrollshareModule } from '../trollshare/trollshare.module';
+import { ClientModule } from 'src/client/client.module';
+import { TrolllikeModule } from 'src/trolllike/trolllike.module';
+import { TrollcommentModule } from 'src/trollcomment/trollcomment.module';
+import { TrollshareModule } from 'src/trollshare/trollshare.module';
 
 @Module({
   imports: [

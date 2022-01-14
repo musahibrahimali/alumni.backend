@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel, InjectConnection } from '@nestjs/mongoose';
 import { MongoGridFS } from 'mongo-gridfs';
 import { Model, Connection } from 'mongoose';
-import {IEvent} from '../interface/interfaces';
+import {IEvent} from 'src/interface/interfaces';
 import { CreateEventDto } from './dto/create-event.dto';
 import { EventsModel } from './schemas/events.schema';
 import { GridFSBucketReadStream } from 'mongodb';

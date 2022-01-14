@@ -8,9 +8,18 @@ import * as cookieParser from 'cookie-parser';
 
 // bootsrap the application
 const bootstrap = async () => {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, { 
-    cors: true,
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: ['error', 'warn', 'debug', 'verbose'],
+  });
+  const configService = app.get(ConfigService);
+  const originUrl = configService.get("ORIGIN_URL")
+
+  // enable cors
+  app.enableCors({
+    credentials: true,
+    origin: originUrl,
+    methods: "HEAD, GET,POST,PUT,DELETE,PATCH",
+    optionsSuccessStatus: 204,
   });
 
   // middlewares
@@ -27,7 +36,6 @@ const bootstrap = async () => {
   SwaggerModule.setup('api', app, document);
 
   // start up server
-  const configService = app.get(ConfigService);
   const port = configService.get('PORT');
   await app.listen(port).then(() => {
     console.log(`Server running on port http://localhost:${port}`);

@@ -1,17 +1,30 @@
-import { Body, Controller, Post, UseInterceptors, UploadedFiles, Get, Param, Delete, Patch } from '@nestjs/common';
+import { 
+    Body, 
+    Controller, 
+    Post, 
+    UseInterceptors, 
+    UploadedFiles, 
+    Get, 
+    Param,
+    Delete, 
+    Patch, 
+    UseGuards
+} from '@nestjs/common';
 import { EventService } from './event.service';
 import IEvent from 'src/interface/event.interface';
 import { CreateEventDto } from './dto/create-event.dto';
 import { ApiOkResponse, ApiConsumes } from '@nestjs/swagger';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { JwtAuthGuard } from 'src/authorization/authorizations';
 
 @Controller('event')
 export class EventController {
     constructor(private eventService: EventService) {}
 
     // create a new event
-    @Post('create-event')
+    @UseGuards(JwtAuthGuard)
     @ApiOkResponse({ type: CreateEventDto, isArray: false, description: 'Event created successfully' })
+    @Post('create-event')
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(FileFieldsInterceptor([
         { name: 'images', maxCount: 10 },
@@ -52,15 +65,16 @@ export class EventController {
     }
 
     // get all events
-    @Get('get-events')
     @ApiOkResponse({ type: CreateEventDto, isArray: true })
+    @Get('get-events')
     async getEvents():Promise<IEvent[]> {
         return await this.eventService.getEvents();
     }
 
     // update a event by id
-    @Patch('update-event/:id')
+    @UseGuards(JwtAuthGuard)
     @ApiOkResponse({ type: CreateEventDto, isArray: false, description: 'Event updated successfully' })
+    @Patch('update-event/:id')
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(FileFieldsInterceptor([
         { name: 'images', maxCount: 10 },
@@ -101,22 +115,23 @@ export class EventController {
     }
 
     // find a event by id
-    @Get('find-event/:id')
     @ApiOkResponse({ type: CreateEventDto, isArray: false })
+    @Get('find-event/:id')
     async findEventById(@Param('id') id: string):Promise<IEvent> {
         return await this.eventService.findEventById(id);
     }
 
     // find a event by title
-    @Get('find-event-by-title/:title')
     @ApiOkResponse({ type: CreateEventDto, isArray: false })
+    @Get('find-event-by-title/:title')
     async findEventByTitle(@Param('title') title: string):Promise<IEvent> {
         return await this.eventService.findEventByTitle(title);
     }
 
     // delete a event by id
-    @Delete('delete-event/:id')
+    @UseGuards(JwtAuthGuard)
     @ApiOkResponse({ type: CreateEventDto, isArray: false, description: 'Event deleted successfully' })
+    @Delete('delete-event/:id')
     async deleteEvent(@Param('id') id: string):Promise<boolean> {
         return await this.eventService.deleteEvent(id);
     }

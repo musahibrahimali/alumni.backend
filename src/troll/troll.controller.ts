@@ -17,31 +17,22 @@ import {ITroll} from '../interface/interfaces';
 import { TrollCommentDto } from './dto/comment.dto';
 import { TrollLikeDto } from './dto/like.dto';
 import { TrollShareDto } from './dto/share.dto';
-import MongooseClassSerializerInterceptor from 'src/interceptors/mongooseClassSerializer.interceptor';
-// import { Troll } from './schemas/troll.schema';
-// import { TrollLike } from '../trolllike/schemas/troll.like.schema';
-// import { TrollShare } from '../trollshare/schemas/troll.share.schema';
-import { TrollComment } from '../trollcomment/schemas/troll.comment.schema';
-// import { Client } from '../client/schemas/client.schema';
-
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/authorization/authorizations';
 @Controller('troll')
-// @UseInterceptors(MongooseClassSerializerInterceptor(Client))
-// @UseInterceptors(MongooseClassSerializerInterceptor(Troll))
-// @UseInterceptors(MongooseClassSerializerInterceptor(TrollLike))
-// @UseInterceptors(MongooseClassSerializerInterceptor(TrollShare))
-@UseInterceptors(MongooseClassSerializerInterceptor(TrollComment))
 export class TrollController {
     constructor(private trollService: TrollService){}
 
     // create a new troll
-    @Post('create-troll')
+    @UseGuards(JwtAuthGuard)
     @ApiOkResponse({ type: CreateTrollDto, isArray: false, description: 'Troll created successfully' })
+    @Post('create-troll')
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(FileFieldsInterceptor([
         { name: 'images', maxCount: 10 },
         { name: 'videos', maxCount: 10 },
     ]))
-    async createTroll(@UploadedFiles() files: { images?: Express.Multer.File[] | any, videos?: Express.Multer.File[] | any }, @Body() createTrollDto:CreateTrollDto): Promise<ITroll>{
+    async createTroll(@UploadedFiles() files: { images?: Express.Multer.File[] | any, videos?: Express.Multer.File[] | any }, @Body() createTrollDto:CreateTrollDto): Promise<ITroll | any>{
         let imageIds: string[] = [];
         let videoIds: string[] = [];
         // get all image ids if images is not empty
@@ -52,31 +43,26 @@ export class TrollController {
             // get all video ids
             videoIds = files.videos.map(video => video.id);
         }
-        const {
-            user :userId,
-            post :post
-        } = createTrollDto;
 
-        const userDto = {
-            user: userId,
-            post: post,
-            images: imageIds,
-            videos: videoIds,
-        }
-        const troll = await this.trollService.createTroll(userDto);
+        createTrollDto.images = imageIds;
+        createTrollDto.videos = videoIds;
+
+        const troll = await this.trollService.createTroll(createTrollDto);
         return troll;
     }
 
     // get all trolls
-    @Get('all-trolls')
+    @UseGuards(JwtAuthGuard)
     @ApiOkResponse({ type: CreateTrollDto, isArray: false, description: 'Troll retrieved successfully' })
+    @Get('all-trolls')
     async getAllTrolls(): Promise<ITroll[]>{
         return this.trollService.findAll();
     }
 
     // update troll
-    @Patch('update-troll/:id')
+    @UseGuards(JwtAuthGuard)
     @ApiOkResponse({ type: CreateTrollDto, isArray: false, description: 'Troll updated successfully' })
+    @Patch('update-troll/:id')
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(FileFieldsInterceptor([
         { name: 'images', maxCount: 10 },
@@ -108,8 +94,9 @@ export class TrollController {
     }
 
     // find troll by id
-    @Get('find-troll/:id')
+    @UseGuards(JwtAuthGuard)
     @ApiOkResponse({ type: CreateTrollDto, isArray: false, description: 'Troll created successfully' })
+    @Get('find-troll/:id')
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(FileFieldsInterceptor([
         { name: 'images', maxCount: 10 },
@@ -120,69 +107,56 @@ export class TrollController {
     }
 
     // add a comment
-    @Patch('add-comment/:id')
+    @UseGuards(JwtAuthGuard)
     @ApiOkResponse({ type: CreateTrollDto, isArray: false, description: 'Troll comment created successfully' })
-    @ApiConsumes('multipart/form-data')
-    @UseInterceptors(FileFieldsInterceptor([
-        { name: 'images', maxCount: 10 },
-        { name: 'videos', maxCount: 10 },
-    ]))
-    async addTrollComment(@UploadedFiles() files: { images?: Express.Multer.File[] | any, videos?: Express.Multer.File[] | any }, @Param('id') id: string, @Body() createCommentDto: TrollCommentDto):Promise<ITroll>{
-        let imageIds: string[] = [];
-        let videoIds: string[] = [];
-        // get all image ids if images is not empty
-        if(files.images) {
-            imageIds = files.images.map(image => image.id);
-        }
-        if(files.videos) {
-            // get all video ids
-            videoIds = files.videos.map(video => video.id);
-        }
-
+    @Patch('add-comment/:id')
+    async addTrollComment(@Param('id') id: string, @Body() createCommentDto: TrollCommentDto):Promise<ITroll>{
         const {user, troll, comment} = createCommentDto;
         const commentDto = {
             user: user,
             troll: troll,
             comment: comment,
-            images: imageIds,
-            videos: videoIds,
         }
-
         return this.trollService.updateComments(id, commentDto);
     }
 
     // delete comment
-    @Delete('delete-comment/:id')
+    @UseGuards(JwtAuthGuard)
     @ApiOkResponse({ type: CreateTrollDto, isArray: false, description: 'Troll comment deleted successfully' })
+    @Delete('delete-comment/:id')
     async deleteTrollComment(@Param('id') id:string, @Body() trollId: string):Promise<boolean>{
-        return this.trollService.deleteComment(id, trollId);
+        return await this.trollService.deleteComment(id, trollId);
     }
 
     // update like
-    @Patch('like-troll/:id')
+    @UseGuards(JwtAuthGuard)
     @ApiOkResponse({ type: CreateTrollDto, isArray: false, description: 'Troll like created successfully' })
+    @Patch('like-troll/:id')
     async likeTroll(@Param('id') id: string, @Body() trollLikeDto: TrollLikeDto):Promise<ITroll>{
-        return this.trollService.updateLikes(id, trollLikeDto)
+        return await this.trollService.updateLikes(id, trollLikeDto);
     }
 
     // delete like
-    @Delete('delete-like/:id')
+    @UseGuards(JwtAuthGuard)
     @ApiOkResponse({ type: CreateTrollDto, isArray: false, description: 'Troll like deleted successfully' })
+    @Delete('delete-like/:id')
     async deleteLike(@Param('id') id:string, @Body() commentId:string):Promise<boolean>{
-        return this.trollService.deleteLike(id, commentId);
+        return await this.trollService.deleteLike(id, commentId);
     }
 
     // update shares
-    @Patch('share-troll/:id')
+    @UseGuards(JwtAuthGuard)
     @ApiOkResponse({ type: CreateTrollDto, isArray: false, description: 'Troll shared successfully' })
+    @Patch('share-troll/:id')
     async shareTroll(@Param('id') id:string, @Body() trollShareDto:TrollShareDto):Promise<ITroll>{
-        return this.trollService.updateShared(id, trollShareDto);
+        return await this.trollService.updateShared(id, trollShareDto);
     }
 
     // delete troll
-    @Delete('delete-troll/:id')
+    @UseGuards(JwtAuthGuard)
     @ApiOkResponse({ type: CreateTrollDto, isArray: false, description: 'Troll deleted successfully' })
+    @Delete('delete-troll/:id')
     async deleteTroll(@Param('id') id: string):Promise<boolean>{
-        return this.trollService.deleteTroll(id);
+        return await this.trollService.deleteTroll(id);
     }
 }

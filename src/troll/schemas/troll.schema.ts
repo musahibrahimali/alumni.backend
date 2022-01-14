@@ -1,20 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IsString } from 'class-validator';
 import * as mongoose from 'mongoose';
-import { Client } from '../../client/schemas/client.schema';
-import { Type, Transform } from 'class-transformer';
-import { ObjectId } from 'mongoose';
+import { Client } from 'src/client/schemas/client.schema';
+import { Type } from 'class-transformer';
 import { TrollLike } from 'src/trolllike/schemas/troll.like.schema';
 import { TrollComment } from 'src/trollcomment/schemas/troll.comment.schema';
-import { TrollShare } from '../../trollshare/schemas/troll.share.schema';
+import { TrollShare } from 'src/trollshare/schemas/troll.share.schema';
 
 export type TrollModel = Troll & Document;
 
 @Schema({timestamps: true })
 export class Troll{
-    @Transform(({ value }) => value.toString())
-    _id: ObjectId;
-
     @IsString()
     @Prop({required: false})
     post: string
@@ -35,11 +31,11 @@ export class Troll{
 
     @Prop({required:false, type: [{ type: mongoose.Schema.Types.ObjectId, ref: TrollComment.name }]})
     @Type(() => TrollComment)
-    comments: [TrollComment]
+    comments: TrollComment[]
 
     @Prop({required:false, type: [{ type: mongoose.Schema.Types.ObjectId, ref: TrollShare.name }]})
     @Type(() => TrollShare)
-    shares: [TrollShare]
+    shares: TrollShare[]
 }
 
 export const TrollSchema = SchemaFactory.createForClass(Troll);

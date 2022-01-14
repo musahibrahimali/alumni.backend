@@ -1,24 +1,19 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Transform } from "class-transformer";
 import { IsBoolean, IsString } from "class-validator";
-import { ObjectId } from "mongoose";
 
 export type ClientModel = Client & Document;
 
 @Schema({timestamps: true })
 export class Client{
-    @Transform(({ value }) => value.toString())
-    _id: ObjectId;
-
     @IsString()
-    @Prop({required: false, unique: true, default: '' })
+    @Prop({required: false, default: '' })
     socialId: string;
 
     @IsString()
     @Prop({ required: true, unique: true })
     username: string;
 
-    @Prop({ required: false, select: false })
+    @Prop({ required: false, })
     password: string;
 
     @IsString()
@@ -38,7 +33,7 @@ export class Client{
     email: string;
 
     @IsString()
-    @Prop({required: false, select: false})
+    @Prop({required: false})
     salt: string;
 
     @Prop({required: false, default: 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'})

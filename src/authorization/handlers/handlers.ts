@@ -1,1 +1,1 @@
-// export {ReadProductPolicyHandler} from './policies.handler';
+export {ReadTrollPolicyHandler} from './policies.handler';

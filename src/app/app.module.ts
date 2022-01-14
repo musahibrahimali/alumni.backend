@@ -3,16 +3,16 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import configuration from '../config/configuration';
-// import { RolesGuard } from '../authorization/guards/roles.guard';
-import { EventModule } from '../event/event.module';
-import { JobModule } from '../job/job.module';
-import { TrollModule } from '../troll/troll.module';
+import configuration from 'src/config/configuration';
+import { RolesGuard } from 'src/authorization/guards/roles.guard';
+import { EventModule } from 'src/event/event.module';
+import { JobModule } from 'src/job/job.module';
+import { TrollModule } from 'src/troll/troll.module';
+import { NewsModule } from 'src/news/news.module';
+import { ClientModule } from 'src/client/client.module';
+import { AdminModule } from 'src/admin/admin.module';
+import { BlogModule } from 'src/blog/blog.module';
 import * as Joi from 'joi';
-import { NewsModule } from '../news/news.module';
-import { ClientModule } from '../client/client.module';
-import { AdminModule } from '../admin/admin.module';
-import { BlogModule } from '../blog/blog.module';
 
 @Module({
   imports: [
