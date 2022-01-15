@@ -30,34 +30,34 @@ export class EventController {
         { name: 'images', maxCount: 10 },
         { name: 'videos', maxCount: 10 },
     ]))
-    async createEvent(@UploadedFiles() files: { images?: Express.Multer.File[] | any, videos?: Express.Multer.File[] | any },@Body() createEventDto: CreateEventDto,):Promise<IEvent> {
+    async createEvent(@UploadedFiles() files: { images?: Express.Multer.File[] | any, videos?: Express.Multer.File[] | any },@Body() createEventDto: CreateEventDto,):Promise<IEvent | any> {
         let imageIds: string[] = [];
         let videoIds: string[] = [];
         // get all image ids if images is not empty
-        if(files.images) {
+        if(files?.images) {
             imageIds = files.images.map(image => image.id);
         }
-        if(files.videos) {
+        if(files?.videos) {
             // get all video ids
             videoIds = files.videos.map(video => video.id);
         }
         const {
-            title:eventTitle, 
-            details:eventDescription,
-            snippet:eventSnippet, 
-            startDate:startDate, 
-            endDate:endDate, 
-            time:eventTime, 
-            venue:eventVenue,
+            title, 
+            details,
+            snippet, 
+            startDate, 
+            endDate, 
+            time, 
+            venue,
         } = createEventDto;
         const eventDto = {
-            title:eventTitle, 
-            details:eventDescription,
-            snippet:eventSnippet, 
-            startDate:startDate, 
-            endDate:endDate, 
-            time:eventTime, 
-            venue:eventVenue,
+            title, 
+            details,
+            snippet, 
+            startDate, 
+            endDate, 
+            time, 
+            venue,
             images: imageIds,
             videos: videoIds,
         };
@@ -84,30 +84,30 @@ export class EventController {
         let imageIds: string[] = [];
         let videoIds: string[] = [];
         // get all image ids if images is not empty
-        if(files.images) {
+        if(files?.images) {
             imageIds = files.images.map(image => image.id);
         }
-        if(files.videos) {
+        if(files?.videos) {
             // get all video ids
             videoIds = files.videos.map(video => video.id);
         }
         const {
-            title:eventTitle, 
-            details:eventDescription,
-            snippet:eventSnippet, 
-            startDate:startDate, 
-            endDate:endDate, 
-            time:eventTime, 
-            venue:eventVenue,
+            title, 
+            details,
+            snippet, 
+            startDate, 
+            endDate, 
+            time, 
+            venue,
         } = createEventDto;
         const eventDto = {
-            title:eventTitle, 
-            details:eventDescription,
-            snippet:eventSnippet, 
-            startDate:startDate, 
-            endDate:endDate, 
-            time:eventTime, 
-            venue:eventVenue,
+            title, 
+            details,
+            snippet, 
+            startDate, 
+            endDate, 
+            time, 
+            venue,
             images: imageIds,
             videos: videoIds,
         };

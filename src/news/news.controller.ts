@@ -23,22 +23,22 @@ export class NewsController {
         let imageIds: string[] = [];
         let videoIds: string[] = [];
         // get all image ids if images is not empty
-        if(files.images) {
+        if(files?.images) {
             imageIds = files.images.map(image => image.id);
         }
-        if(files.videos) {
+        if(files?.videos) {
             // get all video ids
             videoIds = files.videos.map(video => video.id);
         }
         const {
-            title:newsTitle, 
-            details:newsDescription,
-            snippet:newsSnippet, 
+            title, 
+            details,
+            snippet, 
         } = createNewsDto;
         const newsDto = {
-            title:newsTitle, 
-            details:newsDescription,
-            snippet:newsSnippet,
+            title, 
+            details,
+            snippet,
             images: imageIds,
             videos: videoIds,
         }
@@ -47,7 +47,7 @@ export class NewsController {
 
     // get all news
     @ApiOkResponse({ type: CreateNewsDto, isArray: true, description: 'All news' })
-    @Get('get-all-news')
+    @Get('get-news')
     async getAllNews(): Promise<INews[]> {
         return await this.newsService.getAllNews();
     }
@@ -78,18 +78,18 @@ export class NewsController {
     async updateNews(@Param('id') id: string, @UploadedFiles() files: { images?: Express.Multer.File[] | any, videos?: Express.Multer.File[] | any }, @Body() createNewsDto: CreateNewsDto): Promise<INews> {
         // get all image ids
         const imageIds = files.images.map(image => image.id);
-        const videosIds = files.videos.map(video => video.id);
+        const videoIds = files.videos.map(video => video.id);
         const {
-            title:newsTitle, 
-            details:newsDescription,
-            snippet:newsSnippet, 
+            title, 
+            details,
+            snippet, 
         } = createNewsDto;
         const newsDto = {
-            title:newsTitle, 
-            details:newsDescription,
-            snippet:newsSnippet,
+            title, 
+            details,
+            snippet,
             images: imageIds,
-            videos: videosIds,
+            videos: videoIds,
         }
         return await this.newsService.updateNews(id, newsDto);
     }

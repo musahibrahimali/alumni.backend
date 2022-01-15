@@ -34,27 +34,27 @@ export class BlogController {
         let imageIds: string[] = [];
         let videoIds: string[] = [];
         // get all image ids if images is not empty
-        if(files.images) {
+        if(files?.images) {
             imageIds = files.images.map(image => image.id);
         }
-        if(files.videos) {
+        if(files?.videos) {
             // get all video ids
             videoIds = files.videos.map(video => video.id);
         }
         const {
-            title: blogTitle,
-            details: blogDescription,
-            snippet: blogSnippet,
-            date: blogDate,
-            category: blogCategory,
+            title,
+            details,
+            snippet,
+            date,
+            category,
         } = createBlogDto;
         // construct dto to create a new blog item
         const blogDto = {
-            title: blogTitle,
-            details: blogDescription,
-            snippet: blogSnippet,
-            date: blogDate,
-            category: blogCategory,
+            title,
+            details,
+            snippet,
+            date,
+            category,
             images: imageIds,
             videos: videoIds,
         }
@@ -89,19 +89,19 @@ export class BlogController {
             videoIds = files.videos.map(video => video.id);
         }
         const {
-            title: blogTitle,
-            details: blogDescription,
-            snippet: blogSnippet,
-            date: blogDate,
-            category: blogCategory,
+            title,
+            details,
+            snippet,
+            date,
+            category,
         } = createBlogDto;
         // construct dto to create a new blog item
         const blogDto = {
-            title: blogTitle,
-            details: blogDescription,
-            snippet: blogSnippet,
-            date: blogDate,
-            category: blogCategory,
+            title,
+            details,
+            snippet,
+            date,
+            category,
             images: imageIds,
             videos: videoIds,
         }

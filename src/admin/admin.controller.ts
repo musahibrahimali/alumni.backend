@@ -16,7 +16,6 @@ import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { ConfigService } from '@nestjs/config';
 import { ApiCreatedResponse } from '@nestjs/swagger';
-import { LocalAuthGuard } from 'src/authorization/authorizations';
 import { JwtAuthGuard } from '../authorization/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AdminProfileInfoDto } from './dto/admin.profile.response.dto';
@@ -60,16 +59,16 @@ export class AdminController {
 
     // login an admin
     @ApiCreatedResponse({type: String})
-    @UseGuards(LocalAuthGuard)
     @Post('login')
-    async loginClient(@Request() request, @Response({passthrough: true}) response):Promise<{access_token: string}>{
-        // const token = await this.adminService.loginAdmin(request.user);
-        // const domain = this.configService.get("DOMAIN");
-        // response.cookie('access_token', token, {
-        //     domain: domain,
-        //     httpOnly: true,
-        // });
-        return {access_token : "token"};
+    async loginClient(@Body() createAdminDto: CreateAdminDto, @Response({passthrough: true}) response):Promise<{access_token: string}>{
+        const admin = await this.adminService.validateAdmin(createAdminDto);
+        const token = await this.adminService.loginAdmin(admin);
+        const domain = this.configService.get("DOMAIN");
+        response.cookie('access_token', token, {
+            domain: domain,
+            httpOnly: true,
+        });
+        return {access_token : token};
     }
 
     // update profile picture
@@ -85,9 +84,9 @@ export class AdminController {
     // update profile
     @ApiCreatedResponse({type: AdminProfileInfoDto})
     @UseGuards(JwtAuthGuard)
-    @Patch('update-profile:/id')
-    async updateClientProfile(@Param('id') id: string, @Body() updateCLientDto: CreateAdminDto): Promise<AdminProfileInfoDto>{
-        return this.adminService.updateProfile(id, updateCLientDto);
+    @Patch('update-profile/:id')
+    async updateClientProfile(@Param('id') id: string, @Body() updateClientDto: CreateAdminDto): Promise<AdminProfileInfoDto>{
+        return this.adminService.updateProfile(id, updateClientDto);
     }
 
     // get the user profile information
@@ -95,8 +94,8 @@ export class AdminController {
     @UseGuards(JwtAuthGuard)
     @Get('profile')
     async getProfile(@Request() request):Promise<AdminProfileInfoDto> {
-        const {clientId} = request.user;
-        return this.adminService.getProfile(clientId);
+        const {userId} = request.user;
+        return this.adminService.getProfile(userId);
     }
 
     // delete profile picture

@@ -30,28 +30,28 @@ export class JobController {
     async createJob(@UploadedFiles() files: Express.Multer.File[] | any, @Body() createJobDto: CreateJobDto): Promise<IJob> {
         let imageIds: string[] = [];
         // get all image ids if images is not empty
-        if(files.images) {
+        if(files?.images) {
             imageIds = files.images.map(image => image.id);
         }
         const {
-            title:jobTitle, 
-            details:jobDescription,
-            snippet:jobSnippet, 
-            expireDate:expireDate, 
-            location:jobLocation,
-            logo:companyLogo,
-            company:companyName,
-            url:companyUrl,
+            title, 
+            details,
+            snippet, 
+            expireDate, 
+            location,
+            logo,
+            company,
+            url,
         } = createJobDto;
         const jobDto = {
-            title:jobTitle, 
-            details:jobDescription,
-            snippet:jobSnippet, 
-            expireDate:expireDate, 
-            location:jobLocation,
-            logo:companyLogo,
-            company:companyName,
-            url:companyUrl,
+            title, 
+            details,
+            snippet, 
+            expireDate, 
+            location,
+            logo,
+            company,
+            url,
             images: imageIds,
         }
         return await this.jobService.createJob(jobDto);
@@ -91,24 +91,24 @@ export class JobController {
             imageIds = files.images.map(image => image.id);
         }
         const {
-            title:jobTitle, 
-            details:jobDescription,
-            snippet:jobSnippet, 
-            expireDate:expireDate, 
-            location:jobLocation,
-            logo:companyLogo,
-            company:companyName,
-            url:companyUrl,
+            title, 
+            details,
+            snippet, 
+            expireDate, 
+            location,
+            logo,
+            company,
+            url,
         } = createJobDto;
         const jobDto = {
-            title:jobTitle, 
-            details:jobDescription,
-            snippet:jobSnippet, 
-            expireDate:expireDate, 
-            location:jobLocation,
-            logo:companyLogo,
-            company:companyName,
-            url:companyUrl,
+            title, 
+            details,
+            snippet, 
+            expireDate, 
+            location,
+            logo,
+            company,
+            url,
             images: imageIds,
         }
         return await this.jobService.updateJob(id, jobDto);

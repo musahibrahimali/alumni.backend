@@ -35,7 +35,7 @@ export class AdminService {
     }
 
     // log in admin
-    async loginAdmin(user:any): Promise<string> {
+    async loginAdmin(user:IAdmin): Promise<string> {
         try{
             const payload = { username: user.username, sub: user._id };
             return this.jwtService.sign(payload);
@@ -92,8 +92,8 @@ export class AdminService {
     }
 
     // validate client
-    async validateAdmin(email: string, password: string):Promise<AdminProfileInfoDto>{
-        const admin = await this.findOne(email, password);
+    async validateAdmin(createAdminDto: CreateAdminDto):Promise<IAdmin>{
+        const admin = await this.findOne( createAdminDto.username, createAdminDto.password);
         if(admin === undefined) {
             return undefined;
         }
@@ -109,7 +109,7 @@ export class AdminService {
     }
 
     // find one client (user)
-    private async findOne(email: string, password:string): Promise<AdminProfileInfoDto> {
+    private async findOne(email: string, password:string): Promise<IAdmin | any> {
         try{
             const admin = await this.adminModel.findOne({email: email});
             if(!admin) {
@@ -120,17 +120,18 @@ export class AdminService {
             if(!isPasswordValid) {
                 return null;
             }
-            const profileImage = await Promise.resolve(this.readStream(admin.image));
+            const defaultImage = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
+            let profileImage: string;
+            if(admin.image === defaultImage){
+                profileImage = defaultImage;
+            }else{
+                profileImage = await Promise.resolve(this.readStream(admin.image));
+            }
             const userData = {
-                userId: admin._id,
-                email: admin.email,
-                displayName: admin.displayName,
-                firstName: admin.firstName,
-                lastName: admin.lastName,
+                ...admin.toObject(),
                 image : profileImage,
-                phone: admin.phone,
-                isAdmin: admin.isAdmin,
-                roles: admin.roles,
+                password: "",
+                salt: "",
             }
             return userData;
         }catch(error){
@@ -139,23 +140,24 @@ export class AdminService {
     }
 
     // get the profile of a  client (user)
-    private async getAdminProfile(id: string): Promise<AdminProfileInfoDto> {
+    private async getAdminProfile(id: string): Promise<IAdmin | any> {
         try{
             const admin = await this.adminModel.findOne({_id: id});
             if(!admin) {
                 return undefined;
             }
-            const profileImage = await Promise.resolve(this.readStream(admin.image));
+            const defaultImage = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
+            let profileImage: string;
+            if(admin.image === defaultImage){
+                profileImage = defaultImage;
+            }else{
+                profileImage = await Promise.resolve(this.readStream(admin.image));
+            }
             const userData = {
-                userId: admin._id,
-                email: admin.email,
-                displayName: admin.displayName,
-                firstName: admin.firstName,
-                lastName: admin.lastName,
-                image : profileImage,
-                phone: admin.phone,
-                isAdmin: admin.isAdmin,
-                roles: admin.roles,
+                ...admin.toObject(),
+                image: profileImage,
+                password: "",
+                salt: ""
             }
             return userData;
         }catch(error){
@@ -211,20 +213,30 @@ export class AdminService {
     }
 
     // update profile
-    private async updateAdminProfile(id: string, updateClientDto: CreateAdminDto): Promise<AdminProfileInfoDto>{
+    private async updateAdminProfile(id: string, updateClientDto: CreateAdminDto): Promise<IAdmin | any>{
         try{
+            // first find the admin
+            const _admin = await this.adminModel.findOne({_id: id});
             // find and update the client
+            if(updateClientDto.firstName && updateClientDto.lastName){
+                updateClientDto.displayName = updateClientDto.firstName + ' ' + updateClientDto.lastName;
+            }
+            if(updateClientDto.firstName && updateClientDto.lastName.length < 0){
+                updateClientDto.displayName = updateClientDto.firstName + ' ' + _admin.lastName;
+            }
+            if(updateClientDto.firstName.length < 0 && updateClientDto.lastName){
+                updateClientDto.displayName = _admin.firstName + ' ' + updateClientDto.lastName;
+            }
+            // if password is not '' then update the password as well
+            if(updateClientDto.password.length > 6){
+                const hansedPassword = await this.hashPassword(updateClientDto.password, _admin.salt);
+                updateClientDto.password = hansedPassword;
+            }
             const updatedAdmin = await this.adminModel.findOneAndUpdate({_id: id}, updateClientDto, {new: true});
             const userData = {
-                userId: updatedAdmin._id,
-                email: updatedAdmin.email,
-                displayName: updatedAdmin.displayName,
-                firstName: updatedAdmin.firstName,
-                lastName: updatedAdmin.lastName,
-                phone: updatedAdmin.phone,
-                image : updatedAdmin.image,
-                isAdmin: updatedAdmin.isAdmin, 
-                roles: updatedAdmin.roles,
+                ...updatedAdmin.toObject(),
+                password: "",
+                salt: "",
             }
             return userData;
         }catch(error){
