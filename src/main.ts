@@ -6,7 +6,7 @@ import {SwaggerModule, DocumentBuilder} from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-import csurf from 'csurf';
+// import csurf from 'csurf';
 
 // bootsrap the application
 const bootstrap = async () => {
@@ -27,9 +27,9 @@ const bootstrap = async () => {
   // middlewares
   app.use(cookieParser());
   app.use(helmet());
-  app.use(csurf({
-    cookie: true,
-  }));
+  // app.use(csurf({
+  //   cookie: true,
+  // }));
   // global pipes
   app.useGlobalPipes(new ValidationPipe());
   const config = new DocumentBuilder()
