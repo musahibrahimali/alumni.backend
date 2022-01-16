@@ -16,12 +16,11 @@ import {
 import { CreateCLientDto } from './dto/create-client.dto';
 import { ClientService } from './client.service';
 import { ApiCreatedResponse } from '@nestjs/swagger';
-import { LocalAuthGuard,JwtAuthGuard } from 'src/authorization/guards/guards';
 import { ProfileInfoDto } from './dto/profile.response.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { boolean } from 'joi';
 import { ConfigService } from '@nestjs/config';
-import { GoogleAuthGuard, FacebookAuthGuard } from 'src/authorization/authorizations';
+import { GoogleAuthGuard, FacebookAuthGuard,JwtAuthGuard } from 'src/authorization/authorizations';
 
 @Controller('client')
 export class ClientController {
@@ -34,14 +33,8 @@ export class ClientController {
     @ApiCreatedResponse({type: String})
     @Post('register')
     async registerClient(@Body() createClientDto: CreateCLientDto, @Response({passthrough: true}) response): Promise<{access_token: string}>{
-        const {
-            username, password, firstName, lastName,
-        } = createClientDto;
-        const user = {
-            username, password, firstName, lastName,
-        }
         const domain = this.configService.get("DOMAIN");
-        const token = await this.clientService.registerClient(user);
+        const token = await this.clientService.registerClient(createClientDto);
         response.cookie('access_token', token, {
             domain: domain,
             httpOnly: true,
@@ -50,10 +43,10 @@ export class ClientController {
     }
 
     @ApiCreatedResponse({type: String})
-    @UseGuards(LocalAuthGuard)
     @Post('login')
-    async loginClient(@Request() request, @Response({passthrough: true}) response):Promise<{access_token: string}>{
-        const token = await this.clientService.loginClient(request.user);
+    async loginClient(@Body() createClientDto: CreateCLientDto, @Response({passthrough: true}) response):Promise<{access_token: string}>{
+        const client = await this.clientService.validateClient(createClientDto);
+        const token = await this.clientService.loginClient(client);
         const domain = this.configService.get("DOMAIN");
         response.cookie('access_token', token, {
             domain: domain,

@@ -6,8 +6,8 @@ import { Client, ClientModel } from './schemas/client.schema';
 import { CreateCLientDto } from './dto/create-client.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ProfileInfoDto } from './dto/profile.response.dto';
-import { MongoGridFS } from 'mongo-gridfs';
 import { GridFSBucketReadStream } from 'mongodb';
+import { MongoGridFS } from 'mongo-gridfs';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -37,7 +37,7 @@ export class ClientService {
     }
 
     // log in user
-    async loginClient(user:any): Promise<string>{
+    async loginClient(user:IClient): Promise<string>{
         try{
             const payload = { username: user.email, sub: user._id };
             return this.jwtService.sign(payload);
@@ -94,9 +94,9 @@ export class ClientService {
     }
 
     // validate client
-    async validateClient(email: string, password: string):Promise<ProfileInfoDto>{
-        const client = await this.findOne(email, password);
-        if(client === undefined) {
+    async validateClient(createClientDto: CreateCLientDto):Promise<IClient>{
+        const client = await this.findOne( createClientDto.username, createClientDto.password);
+        if(!client) {
             return undefined;
         }
         return client;

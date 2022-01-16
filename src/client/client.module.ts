@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ClientController } from './client.controller';
 import { ClientService } from './client.service';
-import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from 'src/constants/constants';
-import { LocalStrategy,GoogleStrategy,FacebookStrategy } from './strategies/strategies';
+import { GoogleStrategy,FacebookStrategy } from './strategies/strategies';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Client, ClientSchema } from './schemas/client.schema';
 import { MulterModule } from '@nestjs/platform-express';
 import { GridFsMulterConfigService } from './multer/gridfs.multer.service';
 import { JwtStrategy } from 'src/authorization/strategies/jwt.strategy';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
@@ -28,7 +28,6 @@ import { JwtStrategy } from 'src/authorization/strategies/jwt.strategy';
   controllers: [ClientController],
   providers: [
     ClientService,
-    LocalStrategy,
     JwtStrategy,
     GoogleStrategy,
     FacebookStrategy,

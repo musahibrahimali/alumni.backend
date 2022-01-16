@@ -111,7 +111,7 @@ export class AdminService {
     // find one client (user)
     private async findOne(email: string, password:string): Promise<IAdmin | any> {
         try{
-            const admin = await this.adminModel.findOne({email: email});
+            const admin = await this.adminModel.findOne({username: email});
             if(!admin) {
                 return undefined;
             }
