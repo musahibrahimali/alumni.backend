@@ -105,12 +105,8 @@ export class ClientService {
     // validate google client
     async validateSocialClient(socialId: string, user:CreateCLientDto): Promise<IClient>{
         const client = await this.clientModel.findOne({socialId: socialId});
-        const emailClient = await this.clientModel.findOne({username: user.username});
         if(client) {
             return client;
-        }
-        if(emailClient) {
-            return emailClient;
         }
         return await this.clientModel.create(user);
     }

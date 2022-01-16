@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import configuration from 'src/config/configuration';
-import { RolesGuard } from 'src/authorization/guards/roles.guard';
+// import { RolesGuard } from 'src/authorization/guards/roles.guard';
 import { EventModule } from 'src/event/event.module';
 import { JobModule } from 'src/job/job.module';
 import { TrollModule } from 'src/troll/troll.module';
