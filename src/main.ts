@@ -4,7 +4,8 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app/app.module';
 import {SwaggerModule, DocumentBuilder} from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 
 // bootsrap the application
 const bootstrap = async () => {
@@ -24,6 +25,7 @@ const bootstrap = async () => {
 
   // middlewares
   app.use(cookieParser());
+  app.use(helmet());
   // global pipes
   app.useGlobalPipes(new ValidationPipe());
   const config = new DocumentBuilder()
