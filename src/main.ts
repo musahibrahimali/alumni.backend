@@ -6,7 +6,6 @@ import {SwaggerModule, DocumentBuilder} from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-// import csurf from 'csurf';
 
 // bootsrap the application
 const bootstrap = async () => {
