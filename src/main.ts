@@ -6,8 +6,9 @@ import {SwaggerModule, DocumentBuilder} from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+// import csurf from 'csurf';
 
-// bootsrap the application
+// bootstrap the application
 const bootstrap = async () => {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: ['error', 'warn', 'debug', 'verbose'],
@@ -23,12 +24,12 @@ const bootstrap = async () => {
     optionsSuccessStatus: 204,
   });
 
-  // middlewares
+  // middleware
   app.use(cookieParser());
-  app.use(helmet());
+  app.use(helmet()); // basic security
   // app.use(csurf({
   //   cookie: true,
-  // }));
+  // })); // cross site request forgery
   // global pipes
   app.useGlobalPipes(new ValidationPipe());
   const config = new DocumentBuilder()
